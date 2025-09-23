@@ -14,11 +14,12 @@ final class APIClient: APIProtocol {
     }
     
     func imageDataPublisher(fromURLString urlString: String) -> ImageDataPublisher {
-        guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
+        guard let networkManager = networkManager,
+              let url = URL(string: urlString) else { 
+            return Empty().eraseToAnyPublisher() 
+        }
         
-        return Just(urlString)
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(fromURLString:))
+        return networkManager.publisher(fromFullURL: url)
             .mapError { error in APIError.imageDataRequestFailed(error: error) }
             .eraseToAnyPublisher()
     }
@@ -26,9 +27,8 @@ final class APIClient: APIProtocol {
     func charactersPublisher() -> CharactersPublisher {
         guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
 
-        return Just("/api/character/1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20")
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(path:))
+        let request = NetworkRequest.get(path: "/api/character/1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20", timeout: 10.0)
+        return networkManager.publisher(request: request)
             .decode(type: [CharacterResponseModel].self, decoder: JSONDecoder())
             .mapError { error in
                 debugPrint(error)
@@ -40,9 +40,8 @@ final class APIClient: APIProtocol {
     func characterDetailPublisher(with id: String) -> CharacterDetailsPublisher {
         guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
 
-        return Just("/api/character/\(id)")
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(path:))
+        let request = NetworkRequest.get(path: "/api/character/\(id)", timeout: 10.0)
+        return networkManager.publisher(request: request)
             .decode(type: CharacterResponseModel.self, decoder: JSONDecoder())
             .mapError { error in
                 debugPrint(error)
@@ -54,9 +53,8 @@ final class APIClient: APIProtocol {
     func locationPublisher(with id: String) -> LocationPublisher {
         guard let networkManager = networkManager else { return Empty().eraseToAnyPublisher() }
 
-        return Just("/api/location/\(id)")
-            .setFailureType(to: Error.self)
-            .flatMap(networkManager.publisher(path:))
+        let request = NetworkRequest.get(path: "/api/location/\(id)", timeout: 10.0)
+        return networkManager.publisher(request: request)
             .decode(type: LocationDetailsResponseModel.self, decoder: JSONDecoder())
             .mapError { error in
                 debugPrint(error)

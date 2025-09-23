@@ -5,8 +5,8 @@
 
 import Foundation
 
-// FIXME: 1 - Refactor so it accepts and displays underlaying error
-// Fixed
+// FIX ME: 1 - Refactor so it accepts and displays underlaying error
+// Fixed fix 1
 enum APIError: Error, Hashable, Equatable {
     case imageDataRequestFailed(error: Error)
     case charactersRequestFailed(error: Error)
