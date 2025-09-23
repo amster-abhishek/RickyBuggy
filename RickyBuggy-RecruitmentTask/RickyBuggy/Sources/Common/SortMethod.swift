@@ -3,13 +3,12 @@
 //  RickyBuggy
 //
 
-// FIXME: 5 - Fix sorting, so it works - and sorts downloaded characters
-enum SortMethod: Int {
-    case name
+// FIX ME: 5 - Fix sorting, so it works - and sorts downloaded characters
+// Fixed fix 5
+enum SortMethod: Int, CaseIterable {
+    case name = 0
     case episodesCount
-}
-
-extension SortMethod: CustomStringConvertible {
+       
     var description: String {
         switch self {
         case .name:

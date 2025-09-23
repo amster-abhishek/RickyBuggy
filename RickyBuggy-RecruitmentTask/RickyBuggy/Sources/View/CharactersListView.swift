@@ -14,8 +14,17 @@ struct CharactersListView: View {
         _sortMethod = sortMethod
     }
     
+    private var sortedCharacters: [CharacterResponseModel] {
+        switch sortMethod {
+        case .name:
+            return characters.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        case .episodesCount:
+            return characters.sorted { $0.episode.count > $1.episode.count }
+        }
+    }
+    
     var body: some View {
-        List(characters) { character in
+        List(sortedCharacters) { character in
             let destinationViewModel = CharacterDetailViewModel(characterId: character.id, name: character.name)
             let destination = CharacterDetailView(viewModel: destinationViewModel)
 

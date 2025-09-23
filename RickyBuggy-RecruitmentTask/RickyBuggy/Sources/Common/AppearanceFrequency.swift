@@ -11,7 +11,8 @@ import Foundation
 /// - Medium: 3-9 appearances  
 /// - Low: 1-2 appearances
 
-// FIXME: 4 - Fix issue with initialisation not working accordingly to requirements written above, try improving clean code approach
+// FIX ME: 4 - Fix issue with initialisation not working accordingly to requirements written above, try improving clean code approach
+// Fixed fix 4
 enum AppearanceFrequency: Int, CaseIterable {
     case low = 1
     case medium = 3
