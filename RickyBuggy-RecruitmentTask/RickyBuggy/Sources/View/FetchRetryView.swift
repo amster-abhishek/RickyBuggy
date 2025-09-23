@@ -46,6 +46,6 @@ struct FetchRetryView: View {
 
 struct FetchRetryView_Previews: PreviewProvider {
     static var previews: some View {
-        FetchRetryView(errors: [.locationRequestFailed], onRetry: {})
+        FetchRetryView(errors: [.locationRequestFailed(error: URLError(.unknown))], onRetry: {})
     }
 }
