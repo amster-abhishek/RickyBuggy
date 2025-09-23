@@ -33,8 +33,21 @@ struct CharactersListItemView: View {
 
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
-                        // FIXME: 6 - Make URL tappable
-                        Text(viewModel.url)
+                        // FIX ME: 6 - Make URL tappable
+                        // Fixed fix 6
+                        if let url = URL(string: viewModel.url), viewModel.url != "-" {
+                            Button(action: {
+                                viewModel.handleURLTap()
+                            }) {
+                                Text(viewModel.url)
+                                    .foregroundColor(.blue)
+                                    .underline()
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        } else {
+                            Text(viewModel.url)
+                                .foregroundColor(.secondary)
+                        }
 
                         Text(viewModel.created)
                             .contentsStyle()
@@ -43,6 +56,16 @@ struct CharactersListItemView: View {
                 
                 Spacer()
             }
+        }
+        .confirmationDialog("Open link", isPresented: $viewModel.showURLConfirmation) {
+            Button("Open") {
+                viewModel.openURLInSafari()
+            }
+            Button("Cancel", role: .cancel) {
+                viewModel.cancelURLOpening()
+            }
+        } message: {
+            Text("Open link")
         }
     }
 }

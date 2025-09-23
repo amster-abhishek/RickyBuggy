@@ -5,15 +5,19 @@
 
 import Combine
 import Foundation
+import UIKit
 
 final class CharactersListItemViewModel: ObservableObject {
 
     @Published private(set) var characterErrors: [APIError] = []
+    @Published var showURLConfirmation = false
 
     @Published private(set) var title: String = "-"
     @Published private(set) var characterImageData: Data?
     @Published private(set) var created: String = "-"
     @Published private(set) var url: String = "-"
+    
+    private var urlToOpen: URL?
 
     private let characterSubject = CurrentValueSubject<CharacterResponseModel?, Never>(nil)
 
@@ -56,5 +60,27 @@ final class CharactersListItemViewModel: ObservableObject {
             .store(in: &cancellables)
         
         characterSubject.send(character)
+    }
+}
+
+// MARK: For URL Handling
+extension CharactersListItemViewModel {
+    
+    func handleURLTap() {
+        guard let url = URL(string: url), self.url != "-" else { return }
+        urlToOpen = url
+        showURLConfirmation = true
+    }
+    
+    func openURLInSafari() {
+        guard let url = urlToOpen else { return }
+        UIApplication.shared.open(url)
+        urlToOpen = nil
+        showURLConfirmation = false
+    }
+    
+    func cancelURLOpening() {
+        urlToOpen = nil
+        showURLConfirmation = false
     }
 }
