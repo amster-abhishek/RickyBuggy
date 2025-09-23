@@ -15,7 +15,6 @@ struct CharacterDetailView: View {
     
     var body: some View {
         content
-            .navigationTitle(viewModel.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -32,6 +31,7 @@ private extension CharacterDetailView {
         if viewModel.data != nil {
             ScrollView {
                 VStack(alignment: .leading) {
+                    titleSection
                     photoSection
                     detailsSection
                     locationSection
@@ -46,6 +46,24 @@ private extension CharacterDetailView {
                     viewModel.requestData()
                 }
         }
+    }
+}
+
+// MARK: - Section: Title
+
+private extension CharacterDetailView {
+    // FIX ME: 9 - Fix title (character name) so it's displayed on the top, just below navigation bar
+    // Fixed fix 9 - Added title section
+    var titleSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(viewModel.title)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.leading)
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
 }
 
