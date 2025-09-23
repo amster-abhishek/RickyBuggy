@@ -7,23 +7,20 @@ import Foundation
 
 
 /// Level selected based on number of appearances in the show, if character appeared 10 times or more - it's high, if 3 times or more - its medium, if 1 or lower - it's low
-enum AppearanceFrequency: Int {
-    case high = 10
-    case medium = 3
-    case low = 1
-}
+/// - High: 10+ appearances
+/// - Medium: 3-9 appearances  
+/// - Low: 1-2 appearances
 
 // FIXME: 4 - Fix issue with initialisation not working accordingly to requirements written above, try improving clean code approach
-
-extension AppearanceFrequency {
+enum AppearanceFrequency: Int, CaseIterable {
+    case low = 1
+    case medium = 3
+    case high = 10
+    
     init(count: Int) {
-        if count >= 1 {
-            self = .low
-        } else if count >= 3 {
-            self = .medium
-        } else {
-            self = .high
-        }
+        self = Self.allCases
+            .sorted(by: { $0.rawValue > $1.rawValue })
+            .first { count >= $0.rawValue } ?? .low
     }
     
     var popularity: String {
