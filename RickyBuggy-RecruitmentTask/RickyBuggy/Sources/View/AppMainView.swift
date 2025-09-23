@@ -14,15 +14,28 @@ struct AppMainView: View {
             characterListView
                 .navigationTitle(Text("Characters"))
                 .navigationBarTitleDisplayMode(.automatic)
-                // FIXME: 7 - Fix issue with glitching toolbar on entering details view
+                // FIX ME: 7 - Fix issue with glitching toolbar on entering details view
+                // Fixed fix 7: issue due to multiple navigation
                 .toolbar {
                     ToolbarItem(placement: .bottomBar) {
                         sortButton
                     }
                 }
         }
-        .actionSheet(isPresented: $viewModel.showsSortActionSheet) {
-            sortActionSheet
+        .confirmationDialog("Sort method", isPresented: $viewModel.showsSortActionSheet) {
+            Button("Episodes Count") {
+                viewModel.setSortMethod(.episodesCount)
+                viewModel.dismissSortActionSheet()
+            }
+            Button("Name") {
+                viewModel.setSortMethod(.name)
+                viewModel.dismissSortActionSheet()
+            }
+            Button("Cancel", role: .cancel) {
+                viewModel.dismissSortActionSheet()
+            }
+        } message: {
+            Text("Choose sorting method")
         }
     }
 }
@@ -49,22 +62,8 @@ private extension AppMainView {
         }
     }
     
-    // FIXME: 8 - Fix action sheet only appearing once, in other words - after it gets opened and closed, it cannot be opened again
-    var sortActionSheet: ActionSheet {
-        ActionSheet(
-            title: Text("Sort method"),
-            message: Text("Choose sorting method"),
-            buttons: [
-                .default(Text("Episodes Count")) {
-                    viewModel.setSortMethod(.episodesCount)
-                },
-                .default(Text("Name")) {
-                    viewModel.setSortMethod(.name)
-                },
-                .cancel(Text("Cancel")),
-            ]
-        )
-    }
+    // FIX ME: 8 - Fix action sheet only appearing once, in other words - after it gets opened and closed, it cannot be opened again
+    // Fixed fix 8 - Replaced deprecated ActionSheet with confirmationDialog
 }
 
 // MARK: - Preview

@@ -14,7 +14,6 @@ final class AppMainViewModel: ObservableObject {
     @Published private(set) var characterErrors: [APIError] = []
     @Published private(set) var sortMethodDescription: String = "Choose Sorting"
 
-    private let showsSortActionSheetSubject = CurrentValueSubject<Bool?, Never>(nil)
     private let sortMethodSubject = CurrentValueSubject<SortMethod?, Never>(nil)
 
     private var isLoading = false
@@ -31,11 +30,6 @@ final class AppMainViewModel: ObservableObject {
             })
             .store(in: &cancellables)
         
-        showsSortActionSheetSubject
-            .compactMap { $0 }
-            .removeDuplicates()
-            .assign(to: \.showsSortActionSheet, on: self)
-            .store(in: &cancellables)
         
         requestData()
     }
@@ -45,7 +39,11 @@ final class AppMainViewModel: ObservableObject {
     }
     
     func setShowsSortActionSheet() {
-        showsSortActionSheetSubject.send(true)
+        showsSortActionSheet = true
+    }
+    
+    func dismissSortActionSheet() {
+        showsSortActionSheet = false
     }
     
     func requestData() {

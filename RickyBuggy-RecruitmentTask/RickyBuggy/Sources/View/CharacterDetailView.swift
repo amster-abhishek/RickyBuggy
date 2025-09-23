@@ -14,18 +14,16 @@ struct CharacterDetailView: View {
     }
     
     var body: some View {
-        NavigationView {
-            content
-                .navigationTitle(viewModel.title)
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: viewModel.requestData) {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                        }
+        content
+            .navigationTitle(viewModel.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: viewModel.requestData) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
                     }
                 }
-        }
+            }
     }
 }
 
