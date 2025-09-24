@@ -123,10 +123,25 @@ private extension CharacterDetailView {
                 Spacer()
                 
                 Button(action: viewModel.setShowsLocationDetails) {
-                    // FIXME: 12 - change to filled share icon using sfsymbols, confirm if functionallity works, fix if needed
-                    Image(systemName: "globe")
-                        .accentColor(.orange)
+                    // FIX ME: 12 - change to filled share icon using sfsymbols, confirm if functionallity works, fix if needed
+                    // Fixed fix 12 - Changed `globe` icon to to `filled share icon`
+                    Image(systemName: "square.and.arrow.up.fill")
+                        .foregroundColor(.orange)
+                        .font(.title2)
                 }
+            }
+            
+            // Display location name from fetched data
+            if let locationName = viewModel.data?.location.name {
+                Text(locationName)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+            } else {
+                Text("Loading location...")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
             }
         }
         .padding()

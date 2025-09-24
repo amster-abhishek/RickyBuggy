@@ -110,9 +110,18 @@ final class CharacterDetailViewModel: ObservableObject {
         isLoading = true
 
         if let apiService = DIContainer.shared.resolve(APIClient.self), let characterID = characterIDSubject.value {
-            Publishers.Zip(apiService.characterDetailPublisher(with: String(characterID)),
-                           // FIXME: 11 - FIX so location is fetched based on character location id
-                           apiService.locationPublisher(with: "2"))
+            // FIX ME: 11 - FIX so location is fetched based on character location id
+            // Fixed fix 11 - First fetch character, then extract location ID and fetch location
+            apiService.characterDetailPublisher(with: String(characterID))
+                .flatMap { characterDetail -> AnyPublisher<(CharacterResponseModel, LocationDetailsResponseModel), APIError> in
+                    // Extract location ID from character's location URL
+                    let locationID = self.getLocationID(from: characterDetail.location.url)
+                    return apiService.locationPublisher(with: locationID)
+                        .map { locationDetails in
+                            (characterDetail, locationDetails)
+                        }
+                        .eraseToAnyPublisher()
+                }
                 .sink(receiveCompletion: { [weak self] completion in
                     switch completion {
                     case let .failure(error):
@@ -122,10 +131,20 @@ final class CharacterDetailViewModel: ObservableObject {
                     }
 
                     self?.isLoading = false
-                }, receiveValue: { [weak self] characterDetail, comments in
-                    self?.dataSubject.send((characterDetail, comments))
+                }, receiveValue: { [weak self] characterDetail, locationDetails in
+                    self?.dataSubject.send((characterDetail, locationDetails))
                 })
                 .store(in: &cancellables)
         }
+    }
+    
+    private func getLocationID(from locationURL: String) -> String {
+        if let url = URL(string: locationURL) {
+            let components = url.pathComponents
+            if let last = components.last, last != "location" {
+                return last
+            }
+        }
+        return "1"
     }
 }
