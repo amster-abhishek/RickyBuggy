@@ -52,12 +52,16 @@ final class AppMainViewModel: ObservableObject {
         #endif
         
         characterErrors.removeAll()
-
         isLoading = true
 
-        let apiService = DIContainer.shared.resolve(APIClient.self)
+        guard let apiService = DIContainer.shared.resolve(APIClient.self) else {
+            let error = NSError(domain: "DIContainer", code: -1, userInfo: [NSLocalizedDescriptionKey: "APIClient not registered"])
+            characterErrors.append(.charactersRequestFailed(error: error))
+            isLoading = false
+            return
+        }
         
-        apiService?.charactersPublisher()
+        apiService.charactersPublisher()
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {

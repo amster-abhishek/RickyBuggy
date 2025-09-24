@@ -47,6 +47,7 @@ final class CharacterDetailViewModel: ObservableObject {
             .map(\.characterDetails)
 
         dataPublisher
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure(let error) = completion {
                     self?.characterErrors.append(.characterDetailRequestFailed(error: error))
@@ -66,11 +67,13 @@ final class CharacterDetailViewModel: ObservableObject {
             }
             .replaceError(with: Data())
             .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
             .assign(to: \.CharacterPhotoData, on: self)
             .store(in: &cancellables)
 
         characterDetailsPublisher
             .map(\.name)
+            .receive(on: DispatchQueue.main)
             .assign(to: \.title, on: self)
             .store(in: &cancellables)
 
@@ -79,17 +82,20 @@ final class CharacterDetailViewModel: ObservableObject {
             .map(\.count)
             .compactMap(AppearanceFrequency.init(count:))
             .map(\.popularity)
+            .receive(on: DispatchQueue.main)
             .assign(to: \.popularityName, on: self)
             .store(in: &cancellables)
         
         characterDetailsPublisher
             .map(\.url)
             .removeDuplicates()
+            .receive(on: DispatchQueue.main)
             .assign(to: \.url, on: self)
             .store(in: &cancellables)
 
         characterDetailsPublisher
             .map(\.created)
+            .receive(on: DispatchQueue.main)
             .assign(to: \.created, on: self)
             .store(in: &cancellables)
 
@@ -109,10 +115,23 @@ final class CharacterDetailViewModel: ObservableObject {
         characterErrors.removeAll()
         isLoading = true
 
-        if let apiService = DIContainer.shared.resolve(APIClient.self), let characterID = characterIDSubject.value {
-            // FIX ME: 11 - FIX so location is fetched based on character location id
-            // Fixed fix 11 - First fetch character, then extract location ID and fetch location
-            apiService.characterDetailPublisher(with: String(characterID))
+        guard let apiService = DIContainer.shared.resolve(APIClient.self) else {
+            let error = NSError(domain: "DIContainer", code: -1, userInfo: [NSLocalizedDescriptionKey: "APIClient not registered"])
+            characterErrors.append(.characterDetailRequestFailed(error: error))
+            isLoading = false
+            return
+        }
+        
+        guard let characterID = characterIDSubject.value else {
+            let error = NSError(domain: "CharacterID", code: -2, userInfo: [NSLocalizedDescriptionKey: "Character ID not available"])
+            characterErrors.append(.characterDetailRequestFailed(error: error))
+            isLoading = false
+            return
+        }
+        
+        // FIX ME: 11 - FIX so location is fetched based on character location id
+        // Fixed fix 11 - First fetch character, then extract location ID and fetch location
+        apiService.characterDetailPublisher(with: String(characterID))
                 .flatMap { characterDetail -> AnyPublisher<(CharacterResponseModel, LocationDetailsResponseModel), APIError> in
                     // Extract location ID from character's location URL
                     let locationID = self.getLocationID(from: characterDetail.location.url)
@@ -122,6 +141,7 @@ final class CharacterDetailViewModel: ObservableObject {
                         }
                         .eraseToAnyPublisher()
                 }
+                .receive(on: DispatchQueue.main)
                 .sink(receiveCompletion: { [weak self] completion in
                     switch completion {
                     case let .failure(error):
@@ -135,7 +155,6 @@ final class CharacterDetailViewModel: ObservableObject {
                     self?.dataSubject.send((characterDetail, locationDetails))
                 })
                 .store(in: &cancellables)
-        }
     }
     
     private func getLocationID(from locationURL: String) -> String {

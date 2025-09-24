@@ -6,8 +6,9 @@
 import SwiftUI
 
 struct AppMainView: View {
-    // FIXME: 13 - fix issue with re-invoking network request on tapping show list/hide list
-    @ObservedObject var viewModel: AppMainViewModel = AppMainViewModel()
+    // FIX ME: 13 - fix issue with re-invoking network request on tapping show list/hide list
+    // Fixed fix 13 - to avoid re-initiate viewModel instance again - change `@ObservedObject` to `@StateObject`
+    @StateObject var viewModel: AppMainViewModel = AppMainViewModel()
     
     var body: some View {
         NavigationView {

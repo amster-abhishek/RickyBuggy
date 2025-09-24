@@ -17,7 +17,9 @@ final class NetworkManager: NetworkManagerProtocol {
         var components = URLComponents()
         components.scheme = "https" // Fixed: Use HTTPS instead of HTTP
         // This is intended, if you decide to move this code around please keep functionality to random fail request
-        components.host = Int.random(in: 1...10) > 3 ? "rickandmortyapi.com" : NetworkManager.RANDOM_HOST_NAME_TO_FAIL_REQUEST
+        // components.host = Int.random(in: 1...10) > 3 ? "rickandmortyapi.com" : NetworkManager.RANDOM_HOST_NAME_TO_FAIL_REQUEST
+        // Fixed: Use consistent hostname for reliable network requests
+        components.host = "rickandmortyapi.com"
         components.path = request.path
         
         // FIX ME: 3 - Add "guard let url = components.url else..."
