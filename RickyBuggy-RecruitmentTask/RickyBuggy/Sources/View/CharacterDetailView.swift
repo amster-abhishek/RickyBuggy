@@ -5,7 +5,6 @@
 
 import SwiftUI
 
-// FIXME: 9 - Fix title (character name) so it's displayed on the top, just below navigation bar
 struct CharacterDetailView: View {
     @ObservedObject private var viewModel: CharacterDetailViewModel
     
@@ -70,13 +69,14 @@ private extension CharacterDetailView {
 // MARK: - Section: Photo
 
 private extension CharacterDetailView {
-    // FIXME: 10 - Fix so image isn't cropped and still looks good (see Morty for example of how broken it is now)
+    // FIX ME: 10 - Fix so image isn't cropped and still looks good (see Morty for example of how broken it is now)
+    // Fixed fix 10 - Use proper aspect ratio and content mode to prevent cropping
     var photoSection: some View {
         VStack(alignment: .center, spacing: 8) {
             CharacterPhoto(data: viewModel.CharacterPhotoData)
-                .aspectRatio(1, contentMode: .fill)
-                .frame(height: UIScreen.main.bounds.height / 5)
-                .cornerRadius(5)
+                .aspectRatio(contentMode: .fit)
+                .frame(minWidth: UIScreen.main.bounds.width - 16, minHeight: UIScreen.main.bounds.width / 5)
+                .cornerRadius(8)
         }
         .padding()
     }
@@ -158,13 +158,11 @@ private extension CharacterDetailView {
             }
         }
     }
-    
-    // MARK: - Preview
-    
-    struct CharacterDetailView_Previews: PreviewProvider {
-        static var previews: some View {
-            CharacterDetailView(viewModel: CharacterDetailViewModel(characterId: 1, name: "Johnny"))
-        }
-    }
 }
     
+// MARK: - Preview
+struct CharacterDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        CharacterDetailView(viewModel: CharacterDetailViewModel(characterId: 1, name: "Johnny"))
+    }
+}
